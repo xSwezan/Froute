@@ -22,3 +22,10 @@ local Router = Froute.Router{
 	};
 }
 
+local App = Fusion.New("ScreenGui"){
+	Name = "App";
+	
+	[Fusion.Children] = {
+		Froute.Mount(Router); -- Returns a StateObject that contains current page
+	};
+}
