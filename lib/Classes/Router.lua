@@ -8,7 +8,7 @@ Router.__index = Router
 function Router.new(Routes: {Types.Route})
 	local self = setmetatable({}, Router)
 
-	self.CurrentPathRaw = ""
+	self.Path = Fusion.Value("")
 	self.CurrentRoute = nil
 
 	self.PathProps = {} :: {[string]: {}}
@@ -53,11 +53,17 @@ function Router:__Update()
 
 	self.CurrentRoute = CurrentPath.Route :: Types.Route?
 
+	if (self.LastRoute ~= self.CurrentPath) then
+		self.Path:set(table.concat(self.CurrentPath))
+	end
+
 	local Page =
-		if (self.CurrentRoute) then self.CurrentRoute:Construct(self,self.PathProps[self.CurrentPathRaw])
+		if (self.CurrentRoute) then self.CurrentRoute:Construct(self,self.PathProps[self.Path:get()])
 		elseif (self.FixedRoutes["404"]) and (self.FixedRoutes["404"].Route) then self.FixedRoutes["404"].Route:Construct(self)
 		else nil
 	self.PageValue:set(Page)
+
+	self.LastRoute = self.CurrentRoute
 end
 
 function Router:GoTo(Path: string, props: {[string]: any}?)
@@ -68,16 +74,12 @@ function Router:GoTo(Path: string, props: {[string]: any}?)
 	end
 
 	if (#NewPath == 0) then
-		if (#Path > 0) then
-			table.insert(NewPath,"404")
-		else
-			table.insert(NewPath,"/")
-		end
+		table.insert(NewPath,if (#Path > 0) then "404" else "/")
 	end
 	
 	self.PathProps[Path] = props
 	
-	self.CurrentPathRaw = Path
+	self.Path:set(Path)
 	self.CurrentPath = NewPath
 
 	self:__Update()

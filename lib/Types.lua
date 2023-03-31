@@ -12,6 +12,8 @@ export type Router = {
 	GoTo: (self: Router, Path: string, props: {}?) -> nil;
 	Back: (self: Router, Amount: number?) -> nil;
 	Home: (self: Router) -> nil;
+
+	Path: FusionTypes.Value<string>;
 }
 
 export type Route = {

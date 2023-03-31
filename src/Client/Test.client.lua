@@ -91,6 +91,10 @@ local Router = Froute.Router{
 	};
 }
 
+Fusion.Observer(Router.Path):onChange(function()
+	print(Router.Path:get())
+end)
+
 local App = Fusion.New("ScreenGui"){
 	Name = "App";
 	
