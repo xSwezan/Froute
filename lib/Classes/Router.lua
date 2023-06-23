@@ -1,6 +1,5 @@
 local Types = require(script.Parent.Parent.Types)
 local Fusion = require(script.Parent.Parent.Parent.Fusion)
-local RouteClass = require(script.Parent.Route)
 
 local Router = {}
 Router.__index = Router
@@ -30,6 +29,25 @@ function Router.new(Routes: {Types.Route})
 	self.FixedRoutes = LoopRoute(self.Routes)
 
 	self.PageValue = Fusion.Value()
+	self.PageChildren = Fusion.Value{}
+	self.PageProps = Fusion.Value{}
+	self.PageFrame = Fusion.New("Frame"){
+		Name = "Page";
+
+		Size = UDim2.fromScale(1,1);
+
+		Position = UDim2.fromScale(.5,.5);
+		AnchorPoint = Vector2.new(.5,.5);
+
+		BackgroundTransparency = 1;
+
+		[Fusion.Children] = {
+			self.PageChildren;
+			Fusion.Computed(function()
+				return self.PageValue:get()
+			end,Fusion.cleanup);
+		};
+	};
 
 	self:Home()
 
@@ -55,10 +73,11 @@ function Router:__Update()
 
 	if (self.LastRoute ~= self.CurrentPath) then
 		self.Path:set(table.concat(self.CurrentPath))
+		self:SetupPage()
 	end
 
 	local Page =
-		if (self.CurrentRoute) then self.CurrentRoute:Construct(self,self.PathProps[self.Path:get()])
+		if (self.CurrentRoute) then self.CurrentRoute:Construct(self, self.PathProps[self.Path:get()])
 		elseif (self.FixedRoutes["404"]) and (self.FixedRoutes["404"].Route) then self.FixedRoutes["404"].Route:Construct(self)
 		else nil
 	self.PageValue:set(Page)
@@ -66,15 +85,23 @@ function Router:__Update()
 	self.LastRoute = self.CurrentRoute
 end
 
+function Router:SetupPage()
+	if not (self.PageFrame) then return end
+
+	local props: {[string]: any?} = self.PageProps:get() or {}
+
+	self.PageChildren:set(props[Fusion.Children] or {})
+end
+
 function Router:GoTo(Path: string, props: {[string]: any}?)
 	local NewPath = {}
 
 	for Route: string in Path:gmatch("/%w*") do
-		table.insert(NewPath,Route)
+		table.insert(NewPath, Route)
 	end
 
 	if (#NewPath == 0) then
-		table.insert(NewPath,if (#Path > 0) then "404" else "/")
+		table.insert(NewPath, if (#Path > 0) then "404" else "/")
 	end
 	
 	self.PathProps[Path] = props
@@ -90,7 +117,7 @@ function Router:Back(Amount: number?)
 		table.remove(self.CurrentPath, #self.CurrentPath)
 	end
 	if (#self.CurrentPath == 0) then
-		table.insert(self.CurrentPath,"/")
+		table.insert(self.CurrentPath, "/")
 	end
 	self:__Update()
 end

@@ -101,16 +101,19 @@ local App = Fusion.New("ScreenGui"){
 	Parent = Players.LocalPlayer:WaitForChild("PlayerGui");
 	
 	[Fusion.Children] = {
-		Fusion.New("UIListLayout"){
-			FillDirection = Enum.FillDirection.Vertical;
-			
-			VerticalAlignment = Enum.VerticalAlignment.Center;
-			HorizontalAlignment = Enum.HorizontalAlignment.Center;
-		
-			SortOrder = Enum.SortOrder.LayoutOrder;
-		
-			Padding = UDim.new(0,5);
+		Froute.Mount(Router){
+			[Fusion.Children] = {
+				Fusion.New("UIListLayout"){
+					FillDirection = Enum.FillDirection.Vertical;
+					
+					VerticalAlignment = Enum.VerticalAlignment.Center;
+					HorizontalAlignment = Enum.HorizontalAlignment.Center;
+				
+					SortOrder = Enum.SortOrder.LayoutOrder;
+				
+					Padding = UDim.new(0,5);
+				};
+			};
 		};
-		Froute.Mount(Router);
 	};
 }

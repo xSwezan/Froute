@@ -18,7 +18,11 @@ function Froute.Route(Path: string): (props: {}) -> Router
 end
 
 function Froute.Mount(Router: Types.Router): FusionTypes.StateObject<Instance>
-	return Router.PageValue
+	return function(props: {})
+		Router.PageProps:set(props)
+		Router:SetupPage()
+		return Router.PageFrame
+	end
 end
 
 return Froute
