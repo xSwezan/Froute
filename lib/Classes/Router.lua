@@ -4,6 +4,25 @@ local Fusion = require(script.Parent.Parent.Parent.Fusion)
 local Router = {}
 Router.__index = Router
 
+local function get(Value: any): any
+	if (type(Value) == "table") and (type(Value.get) == "function") then
+		return Value:get()
+	end
+
+	return Value
+end
+
+local function recursiveGet(Value: any): any
+	local LastValue
+
+	while (LastValue ~= Value) do
+		LastValue = Value
+		Value = get(Value)
+	end
+
+	return Value
+end
+
 function Router.new(Routes: {Types.Route})
 	local self = setmetatable({}, Router)
 
@@ -80,7 +99,7 @@ function Router:__Update()
 		if (self.CurrentRoute) then self.CurrentRoute:Construct(self, self.PathProps[self.Path:get()])
 		elseif (self.FixedRoutes["404"]) and (self.FixedRoutes["404"].Route) then self.FixedRoutes["404"].Route:Construct(self)
 		else nil
-	self.PageValue:set(Page)
+	self.PageValue:set(recursiveGet(Page))
 
 	self.LastRoute = self.CurrentRoute
 end
