@@ -79,14 +79,15 @@ function Router:__Update()
 		[string]: {};
 	} = self.FixedRoutes
 
-	for _, Path: string in ipairs(self.CurrentPath) do
-		CurrentPath = CurrentPath[Path]
+	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {} -- Not a dictionary so I changed it :/
+	-- for _, Path: string in ipairs(self.CurrentPath) do
+	-- 	CurrentPath = CurrentPath[Path]
 
-		if not (CurrentPath) then
-			CurrentPath = {}
-			break
-		end
-	end
+	-- 	if not (CurrentPath) then
+	-- 		CurrentPath = {}
+	-- 		break
+	-- 	end
+	-- end
 
 	self.CurrentRoute = CurrentPath.Route :: Types.Route?
 
