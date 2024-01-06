@@ -7,6 +7,10 @@ local Froute = require(ReplicatedStorage.lib)
 local Router = Froute.Router{
 	Froute.Route("/"){
 		Construct = function(Router, props)
+			Router.Janitor:Add(function()
+				print("Cleanup '/'")
+			end, true)
+
 			return Fusion.ForValues({"/players","/settings"},function(Path: string)
 				return Fusion.New("TextButton"){
 					Size = UDim2.fromOffset(200,50);
@@ -22,6 +26,10 @@ local Router = Froute.Router{
 	};
 	Froute.Route("404"){
 		Construct = function(Router, props)
+			Router.Janitor:Add(function()
+				print("Cleanup '404'")
+			end, true)
+
 			return {
 				Fusion.New("TextLabel"){
 					Size = UDim2.fromOffset(200,50);

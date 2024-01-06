@@ -1,4 +1,5 @@
 local FusionTypes = require(script.Parent.FusionTypes)
+local Janitor = require(script.Parent.Parent.Janitor)
 
 local Types = {}
 
@@ -14,6 +15,7 @@ export type Router = {
 	Home: (self: Router) -> nil;
 
 	Path: FusionTypes.Value<string>;
+	Janitor: Janitor.Janitor;
 }
 
 export type Route = {

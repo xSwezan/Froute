@@ -1,5 +1,6 @@
 local Types = require(script.Parent.Parent.Types)
 local Fusion = require(script.Parent.Parent.Parent.Fusion)
+local Janitor = require(script.Parent.Parent.Parent.Janitor)
 
 local Router = {}
 Router.__index = Router
@@ -24,13 +25,15 @@ local function recursiveGet(Value: any): any
 end
 
 function Router.new(Routes: {Types.Route})
-	local self = setmetatable({}, Router)
+	local self = setmetatable({
+		Janitor = Janitor.new();
 
-	self.Path = Fusion.Value("")
-	self.CurrentRoute = nil
+		Path = Fusion.Value("");
+		CurrentRoute = nil;
 
-	self.PathProps = {} :: {[string]: {}}
-	self.Routes = Routes
+		PathProps = {} :: {[string]: {}};
+		Routes = Routes;
+	}, Router)
 
 	local function LoopRoute(Routes: {Types.Route})
 		local Output = {}
@@ -79,19 +82,12 @@ function Router:__Update()
 		[string]: {};
 	} = self.FixedRoutes
 
-	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {} -- Not a dictionary so I changed it :/
-	-- for _, Path: string in ipairs(self.CurrentPath) do
-	-- 	CurrentPath = CurrentPath[Path]
-
-	-- 	if not (CurrentPath) then
-	-- 		CurrentPath = {}
-	-- 		break
-	-- 	end
-	-- end
+	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {}
 
 	self.CurrentRoute = CurrentPath.Route :: Types.Route?
 
 	if (self.LastRoute ~= self.CurrentPath) then
+		self.Janitor:Cleanup()
 		self.Path:set(table.concat(self.CurrentPath))
 		self:SetupPage()
 	end
