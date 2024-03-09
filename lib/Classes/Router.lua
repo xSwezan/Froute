@@ -38,8 +38,8 @@ function Router.new(Routes: {Types.Route})
 	local function LoopRoute(Routes: {Types.Route})
 		local Output = {}
 
-		for _, Route: Types.Route in Routes or {} do
-			local ChildrenRoutes: {Types.Route} = LoopRoute(Route.Routes)
+		for _, Route: Types.Route in pairs(Routes or {}) do
+			local ChildrenRoutes: {[string]: Types.Route} = LoopRoute(Route.Routes)
 			ChildrenRoutes["Route"] = Route
 
 			Output[Route.Path] = ChildrenRoutes
@@ -50,7 +50,7 @@ function Router.new(Routes: {Types.Route})
 
 	self.FixedRoutes = LoopRoute(self.Routes)
 
-	self.PageValue = Fusion.Value()
+	self.PageValue = Fusion.Value(nil)
 	self.PageChildren = Fusion.Value{}
 	self.PageProps = Fusion.Value{}
 	self.PageFrame = Fusion.New("Frame"){
@@ -77,12 +77,9 @@ function Router.new(Routes: {Types.Route})
 end
 
 function Router:__Update()
-	local CurrentPath: {
-		Route: Types.Route;
-		[string]: {};
-	} = self.FixedRoutes
+	local CurrentPath: Types.Path = self.FixedRoutes
 
-	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {}
+	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {Route = nil}
 
 	self.CurrentRoute = CurrentPath.Route :: Types.Route?
 
@@ -104,7 +101,7 @@ end
 function Router:SetupPage()
 	if not (self.PageFrame) then return end
 
-	local props: {[string]: any?} = self.PageProps:get() or {}
+	local props: {[any]: any?} = self.PageProps:get() or {}
 
 	self.PageChildren:set(props[Fusion.Children] or {})
 end

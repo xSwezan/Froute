@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Fusion = require(ReplicatedStorage.lib.Fusion)
-local Froute = require(ReplicatedStorage.lib)
+local Froute = require(ReplicatedStorage.lib.lib)
 
 local Router = Froute.Router{
 	Froute.Route("/"){

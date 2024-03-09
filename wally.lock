@@ -19,5 +19,5 @@ dependencies = [["Promise", "evaera/promise@4.0.0"]]
 
 [[package]]
 name = "xswezan/froute"
-version = "1.0.4"
+version = "1.0.6"
 dependencies = [["Fusion", "elttob/fusion@0.2.0"], ["Janitor", "howmanysmall/janitor@1.15.7"]]

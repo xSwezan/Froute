@@ -4,9 +4,9 @@ local Janitor = require(script.Parent.Parent.Janitor)
 local Types = {}
 
 export type Froute = {
-	Router: (Routes: {}) -> Router;
+	Router: (Routes: {Route}) -> Router;
 	Route: (Path: string) -> (props: {}) -> Route;
-	Mount: (Router: Router) -> FusionTypes.StateObject<Instance>;
+	Mount: (Router: Router) -> (props: {}) -> FusionTypes.StateObject<Instance>;
 }
 
 export type Router = {
@@ -19,13 +19,20 @@ export type Router = {
 }
 
 export type Route = {
-	
+	Path: string,
+	props: RouteInfo,
+	Routes: {Route},
 }
 
 export type RouteInfo = {
 	Construct: (Router: Router, props: {}) -> Instance?;
 	
-	[FusionTypes.Children]: {Route};
+	[FusionTypes.SpecialKey]: {Route};
+}
+
+export type Path = {
+	Route: Route;
+	[string]: Path;
 }
 
 return Types

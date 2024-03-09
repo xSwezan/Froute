@@ -21,6 +21,8 @@ function Route:Construct(Router: Types.Router, props: {}?): Instance?
 	if (type(self.props.Construct) == "function") then
 		return self.props.Construct(Router, props or {})
 	end
+
+	return
 end
 
 return Route
