@@ -1,7 +1,7 @@
 [package]
 name = "xswezan/froute"
 description = "A Router for Fusion"
-version = "1.0.6"
+version = "1.0.7"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 

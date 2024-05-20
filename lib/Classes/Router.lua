@@ -24,6 +24,19 @@ local function recursiveGet(Value: any): any
 	return Value
 end
 
+local function loopRoute(Routes: {Types.Route})
+	local Output = {}
+
+	for _, Route: Types.Route in pairs(Routes or {}) do
+		local ChildrenRoutes: {[string]: Types.Route} = loopRoute(Route.Routes)
+		ChildrenRoutes["Route"] = Route
+
+		Output[Route.Path] = ChildrenRoutes
+	end
+
+	return Output
+end
+
 function Router.new(Routes: {Types.Route})
 	local self = setmetatable({
 		Janitor = Janitor.new();
@@ -32,23 +45,14 @@ function Router.new(Routes: {Types.Route})
 		CurrentRoute = nil;
 
 		PathProps = {} :: {[string]: {}};
-		Routes = Routes;
+		Routes = {};
 	}, Router)
 
-	local function LoopRoute(Routes: {Types.Route})
-		local Output = {}
-
-		for _, Route: Types.Route in pairs(Routes or {}) do
-			local ChildrenRoutes: {[string]: Types.Route} = LoopRoute(Route.Routes)
-			ChildrenRoutes["Route"] = Route
-
-			Output[Route.Path] = ChildrenRoutes
-		end
-
-		return Output
+	for _, Route: Types.Route in Routes do
+		self:AddRoute(Route)
 	end
 
-	self.FixedRoutes = LoopRoute(self.Routes)
+	self.FixedRoutes = loopRoute(self.Routes)
 
 	self.PageValue = Fusion.Value(nil)
 	self.PageChildren = Fusion.Value{}
@@ -138,6 +142,11 @@ end
 function Router:Home()
 	self.CurrentPath = {"/"}
 	self:__Update()
+end
+
+function Router:AddRoute(Route: Types.Route)
+	table.insert(self.Routes, Route)
+	self.FixedRoutes = loopRoute(self.Routes)
 end
 
 return Router

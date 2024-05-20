@@ -13,6 +13,7 @@ export type Router = {
 	GoTo: (self: Router, Path: string, props: {}?) -> nil;
 	Back: (self: Router, Amount: number?) -> nil;
 	Home: (self: Router) -> nil;
+	AddRoute: (self: Router, Route: Route) -> nil;
 
 	Path: FusionTypes.Value<string>;
 	Janitor: Janitor.Janitor;
