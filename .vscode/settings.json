@@ -8,6 +8,6 @@
 			},
 		]
 	},
-	"robloxLsp.workspace.rojoProjectFile": "release",
-	"luau-lsp.sourcemap.rojoProjectFile": "release.project.json"
+	"luau-lsp.sourcemap.rojoProjectFile": "release.project.json",
+	"luau-lsp.completion.imports.requireStyle": "alwaysRelative"
 }

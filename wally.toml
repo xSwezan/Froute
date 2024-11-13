@@ -1,12 +1,9 @@
 [package]
 name = "xswezan/froute"
-description = "A Router for Fusion"
-version = "1.0.7"
+description = "A Router for Fusion 0.3"
+version = "1.1.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
 [dependencies]
-Janitor = "howmanysmall/janitor@1.15.7"
-# Promise = "evaera/promise@4.0.0"
-
-Fusion = "elttob/fusion@0.2.0"
+Fusion = "elttob/fusion@0.3.0"
