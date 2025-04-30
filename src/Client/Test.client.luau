@@ -1,129 +1,120 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Fusion = require(ReplicatedStorage.lib.Fusion)
-local Froute = require(ReplicatedStorage.lib.lib)
+local Fusion = require(ReplicatedStorage.lib.Fusion) :: any
+local Froute = require(ReplicatedStorage.lib.lib) :: any
 
-local MainScope = Fusion.scoped(Fusion)
+local mainScope = Fusion.scoped(Fusion)
 
-local Router = Froute.Router(MainScope, {
+local router = Froute.Router(mainScope, {
 	Froute.Route("/"){
-		Construct = function(Router, props, scope)
+		Construct = function(router, props, scope)
 			table.insert(scope, function()
 				print("Cleanup '/'")
 			end)
 
-			return scope:ForValues({"/players","/settings"}, function(use, scope, Path: string)
+			return scope:ForValues({"/players","/settings"}, function(use, scope, path: string)
 				return scope:New("TextButton"){
-					Size = UDim2.fromOffset(200,50);
+					Size = UDim2.fromOffset(200, 50),
 
-					Text = Path;
+					Text = path,
 
 					[Fusion.OnEvent("Activated")] = function()
-						Router:GoTo(Path)
-					end;
+						router:GoTo(path)
+					end,
 				}
-			end);
-		end;
-	};
+			end)
+		end,
+	},
 	Froute.Route("404"){
-		Construct = function(Router, props, scope)
+		Construct = function(router, props, scope)
 			table.insert(scope, function()
 				print("Cleanup 404")
 			end)
 
 			return {
 				scope:New("TextLabel"){
-					Size = UDim2.fromOffset(200,50);
-
-					Text = "Page not found! (404)";
+					Size = UDim2.fromOffset(200, 50),
+					Text = "Page not found! (404)",
 				};
 				scope:New("TextButton"){
-					Size = UDim2.fromOffset(100,50);
-
-					Text = "Home";
+					Size = UDim2.fromOffset(100, 50),
+					Text = "Home",
 
 					[Fusion.OnEvent("Activated")] = function()
-						Router:Home()
-					end;
-				};
+						router:Home()
+					end,
+				},
 			}
-		end;
-	};
+		end,
+	},
 	Froute.Route("/players"){
-		Construct = function(Router, props, scope)
-			return scope:ForValues(Players:GetPlayers(), function(use, scope, Player: Player)
+		Construct = function(router, props, scope)
+			return scope:ForValues(Players:GetPlayers(), function(use, scope, player: Player)
 				return scope:New("TextButton"){
-					Size = UDim2.fromOffset(200,50);
-
-					Text = Player.Name;
+					Size = UDim2.fromOffset(200, 50),
+					Text = player.Name,
 
 					[Fusion.OnEvent("Activated")] = function()
-						Router:GoTo("/players/player", {UserId = Player.UserId})
-					end;
+						router:GoTo("/players/player", {UserId = player.UserId})
+					end,
 				}
-			end);
-		end;
+			end)
+		end,
 		[Fusion.Children] = {
 			Froute.Route("/player"){
-				Construct = function(Router, props, scope)
+				Construct = function(router, props, scope)
 					return scope:New("TextButton"){
-						Size = UDim2.fromOffset(200, 50);
-
-						Text = `Viewing {props.UserId}`;
-
-						BackgroundColor3 = Color3.fromRGB(0,255,0);
+						Size = UDim2.fromOffset(200, 50),
+						Text = `Viewing {props.UserId}`,
+						BackgroundColor3 = Color3.fromRGB(0, 255, 0),
 
 						[Fusion.OnEvent("Activated")] = function()
-							Router:Back()
-						end;
-					};
-				end;
-			};
-		};
-	};
+							router:Back()
+						end,
+					}
+				end,
+			},
+		},
+	},
 	Froute.Route("/settings"){
-		Construct = function(Router, props, scope)
+		Construct = function(router, props, scope)
 			return scope:New("TextButton"){
-				Size = UDim2.fromOffset(200,50);
+				Size = UDim2.fromOffset(200, 0),
 
-				Text = "This is the settings :)";
+				Text = "This is the settings :)",
 
-				BackgroundColor3 = Color3.fromRGB(0,255,0);
+				BackgroundColor3 = Color3.fromRGB(0, 255, 0),
 
 				[Fusion.OnEvent("Activated")] = function()
 					-- Router:Back()
 					-- Router:Home()
-					Router:GoTo("/players/haha")
-				end;
-			};
-		end;
-	};
+					router:GoTo("/players/haha")
+				end,
+			}
+		end,
+	}
 })
 
-MainScope:Observer(Router.Path):onChange(function()
-	print(Fusion.peek(Router.Path))
+mainScope:Observer(router.Path):onChange(function()
+	print(Fusion.peek(router.Path))
 end)
 
-local App = MainScope:New("ScreenGui"){
-	Name = "App";
-
-	Parent = Players.LocalPlayer:WaitForChild("PlayerGui");
+mainScope:New("ScreenGui"){
+	Name = "App",
+	Parent = Players.LocalPlayer:WaitForChild("PlayerGui"),
 
 	[Fusion.Children] = {
-		Froute.Mount(MainScope, Router){
+		Froute.Mount(mainScope, router){
 			[Fusion.Children] = {
-				MainScope:New("UIListLayout"){
-					FillDirection = Enum.FillDirection.Vertical;
-
-					VerticalAlignment = Enum.VerticalAlignment.Center;
-					HorizontalAlignment = Enum.HorizontalAlignment.Center;
-
-					SortOrder = Enum.SortOrder.LayoutOrder;
-
-					Padding = UDim.new(0,5);
-				};
-			};
-		};
-	};
+				mainScope:New("UIListLayout"){
+					FillDirection = Enum.FillDirection.Vertical,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0,5),
+				},
+			},
+		},
+	},
 }

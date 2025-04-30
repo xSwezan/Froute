@@ -8,51 +8,53 @@
 # Documentation
 The docs are WIP, but I'll show you an example of how to use it for now.
 ```lua
-local Router = Froute.Router{
+local scope = Fusion.scoped(Fusion)
+
+local router = Froute.Router(scope, {
 	Froute.Route("/"){ -- Home page
-		Construct = function(Router, props){
-			return Fusion.New("Frame"){}	
-		};
-	};
+		Construct = function(router, props, scope){
+			return scope:New("Frame"){}
+		},
+	},
 	Froute.Route("404"){ -- Page not found (NOT NECESSARY)
-		Construct = function(Router, props)
+		Construct = function(router, props, scope)
 			return Fusion.New("TextButton"){
-				Size = UDim2.fromOffset(200,50);
-				
-				Text = "Page not found (404)";
-				
+				Size = UDim2.fromOffset(200,50),
+
+				Text = "Page not found (404)",
+
 				[Fusion.OnEvent("Activated")] = function()
-					Router:Home() -- Go home if button clicked
-				end;
-			};
-		end;
-	};
+					router:Home() -- Go home if button clicked
+				end,
+			},
+		end,
+	},
 	Froute.Route("/settings"){
-		Construct = function(Router, props)
+		Construct = function(router, props, scope)
 			return Fusion.New("Frame"){}
-		end;
-	};
+		end,
+	},
 	Froute.Route("/players"){
-		Construct = function(Router, props)
+		Construct = function(router, props, scope)
 			return Fusion.New("Frame"){}
-		end;
+		end,
 
 		[Fusion.Children] = {
 			Froute.Route("/player"){
-				Construct = function(Router, props)
-					return Fusion.New("TextLabel"){Text = props.UserId}
-				end;
-			};
-		};
-	};
-}
+				Construct = function(router, props, scope)
+					return scope:New("TextLabel"){Text = props.UserId}
+				end,
+			},
+		},
+	},
+})
 
-local App = Fusion.New("ScreenGui"){
-	Name = "App";
-	
+local App = scope:New("ScreenGui"){
+	Name = "App",
+
 	[Fusion.Children] = {
 		Froute.Mount(Router); -- Returns a StateObject that contains current page
-	};
+	},
 }
 ```
 And here are some of the methods of the Router

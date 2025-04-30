@@ -4,31 +4,31 @@ local Fusion = require(script.Parent.Parent.Parent.Fusion)
 local Router = {}
 Router.__index = Router
 
-local function recursiveGet(Value: any): any
-	local LastValue
+local function recursiveGet(value: any): any
+	local lastValue: any
 
-	while (LastValue ~= Value) do
-		LastValue = Value
-		Value = Fusion.peek(Value)
+	while (lastValue ~= value) do
+		lastValue = value
+		value = Fusion.peek(value)
 	end
 
-	return Value
+	return value
 end
 
-local function loopRoute(Routes: {Types.Route})
-	local Output = {}
+local function loopRoute(routes: {Types.Route})
+	local output = {}
 
-	for _, Route: Types.Route in pairs(Routes or {}) do
-		local ChildrenRoutes: {[string]: Types.Route} = loopRoute(Route.Routes)
-		ChildrenRoutes["Route"] = Route
+	for _, route: Types.Route in pairs(routes or {}) do
+		local childrenRoutes: {[string]: Types.Route} = loopRoute(route.Routes)
+		childrenRoutes["Route"] = route
 
-		Output[Route.Path] = ChildrenRoutes
+		output[route.Path] = childrenRoutes
 	end
 
-	return Output
+	return output
 end
 
-function Router.new(scope: Fusion.Scope<unknown>, Routes: {Types.Route})
+function Router.new(scope: Fusion.Scope<unknown>, routes: {Types.Route})
 	local self = setmetatable({
 		Path = Fusion.Value(scope, "");
 		_currentRoute = nil;
@@ -40,8 +40,8 @@ function Router.new(scope: Fusion.Scope<unknown>, Routes: {Types.Route})
 		_routeScope = Fusion.innerScope(scope);
 	}, Router)
 
-	for _, Route: Types.Route in Routes do
-		self:AddRoute(Route)
+	for _, route: Types.Route in routes do
+		self:AddRoute(route)
 	end
 
 	self._fixedRoutes = loopRoute(self.Routes)
@@ -52,20 +52,20 @@ function Router.new(scope: Fusion.Scope<unknown>, Routes: {Types.Route})
 	self._pageFrame = Fusion.New(scope, "Frame"){
 		Name = "Page";
 
-		Size = UDim2.fromScale(1, 1);
+		Size = UDim2.fromScale(1, 1),
 
-		Position = UDim2.fromScale(.5, .5);
-		AnchorPoint = Vector2.new(.5, .5);
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
 
-		BackgroundTransparency = 1;
+		BackgroundTransparency = 1,
 
 		[Fusion.Children] = {
-			self._pageChildren;
+			self._pageChildren,
 			Fusion.Computed(scope, function(use, scope)
 				return use(self._pageValue)
-			end);
-		};
-	};
+			end),
+		}
+	}
 
 	self:Home()
 
@@ -77,14 +77,12 @@ end
 -->-----------------<--
 
 function Router:_update()
-	local CurrentPath: Types.Path = self._fixedRoutes
+	local currentPath: Types.Path = self._fixedRoutes
+	currentPath = currentPath[table.concat(self.CurrentPath)] or {Route = nil}
 
-	CurrentPath = CurrentPath[table.concat(self.CurrentPath)] or {Route = nil}
-
-	self._currentRoute = CurrentPath.Route :: Types.Route?
+	self._currentRoute = currentPath.Route :: Types.Route?
 
 	if (self.LastRoute ~= self.CurrentPath) then
-		-- self.Janitor:Cleanup()
 		Fusion.doCleanup(self._routeScope)
 		self._routeScope = Fusion.innerScope(self._scope)
 		self.Path:set(table.concat(self.CurrentPath))
@@ -106,7 +104,6 @@ function Router:_setupPage()
 	if not (self._pageFrame) then return end
 
 	local props: {[any]: any?} = Fusion.peek(self._pageProps) or {}
-
 	self._pageChildren:set(props[Fusion.Children] or {})
 end
 
@@ -114,27 +111,27 @@ end
 --> Methods <--
 -->---------<--
 
-function Router:GoTo(Path: string, props: {[string]: any}?)
-	local NewPath = {}
+function Router:GoTo(path: string, props: {[string]: any}?)
+	local newPath = {}
 
-	for Route: string in Path:gmatch("/%w*") do
-		table.insert(NewPath, Route)
+	for route: string in path:gmatch("/%w*") do
+		table.insert(newPath, route)
 	end
 
-	if (#NewPath == 0) then
-		table.insert(NewPath, if (#Path > 0) then "404" else "/")
+	if (#newPath == 0) then
+		table.insert(newPath, if (#path > 0) then "404" else "/")
 	end
 
-	self._pathProps[Path] = props
+	self._pathProps[path] = props
 
-	self.Path:set(Path)
-	self.CurrentPath = NewPath
+	self.Path:set(path)
+	self.CurrentPath = newPath
 
 	self:_update()
 end
 
-function Router:Back(Amount: number?)
-	for _ = 1, (Amount or 1) do
+function Router:Back(amount: number?)
+	for _ = 1, (amount or 1) do
 		table.remove(self.CurrentPath, #self.CurrentPath)
 	end
 	if (#self.CurrentPath == 0) then
@@ -148,8 +145,8 @@ function Router:Home()
 	self:_update()
 end
 
-function Router:AddRoute(Route: Types.Route)
-	table.insert(self.Routes, Route)
+function Router:AddRoute(route: Types.Route)
+	table.insert(self.Routes, route)
 	self._fixedRoutes = loopRoute(self.Routes)
 end
 
